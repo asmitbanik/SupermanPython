@@ -1,16 +1,18 @@
-version: '3.8'
 services:
   backend:
     build:
       context: ..
       dockerfile: docker/backend.Dockerfile
-    ports:
-      - "5000:5000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    ports: ["5000:5000"]
+
   frontend:
     build:
       context: ..
       dockerfile: docker/frontend.Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:5000
+    ports: ["3000:3000"]
+    depends_on: [backend]
