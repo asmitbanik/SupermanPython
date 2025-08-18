@@ -1,2 +1,9 @@
-flask
+fastapi
+uvicorn[standard]
+requests
+python-dotenv
 faiss-cpu
+tiktoken
+orjson
+pydantic
+numpy
