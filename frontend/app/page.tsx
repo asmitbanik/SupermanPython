@@ -12,7 +12,11 @@ export default function Page() {
   const [cites, setCites] = useState<Cite[]>([]);
   const [msg, setMsg] = useState("");
 
-  const backend = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  // Use environment variable injected at build time for client components
+  // Avoid process.env in browser: use public env or fallback
+  const backend = typeof window !== "undefined" && (window as any).NEXT_PUBLIC_BACKEND_URL
+    ? (window as any).NEXT_PUBLIC_BACKEND_URL as string
+    : "http://localhost:5000";
 
   async function doIndex() {
     setMsg(""); setIndexing(true);
