@@ -4,12 +4,12 @@
 
 ---
 
-## 🚀 Overview
+## Overview
 SupermanPython is an AI-powered onboarding assistant for developers joining new codebases. It crawls any GitHub repository, indexes code and docs, and answers natural language questions with context-grounded, cited responses. Built with a modern, scalable architecture and best practices for real-world deployment.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 ```
 [ User ]
    |
@@ -44,7 +44,7 @@ SupermanPython is an AI-powered onboarding assistant for developers joining new 
 
 ---
 
-## ✨ Features
+## Features
 - **RAG Pipeline**: Retrieval-augmented generation for accurate, cited answers
 - **GitHub Integration**: Async crawling, incremental updates, supports public/private repos
 - **Chunking**: Markdown/code-aware, token-based chunking for optimal context
@@ -55,14 +55,14 @@ SupermanPython is an AI-powered onboarding assistant for developers joining new 
 
 ---
 
-## 🖥️ Tech Stack
+## Tech Stack
 - **Frontend**: Next.js, React, TypeScript, Axios
 - **Backend**: FastAPI (async), Pydantic, httpx, FAISS, Gemini API, tiktoken
 - **DevOps**: Docker, dotenv, pytest
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 ```
 SupermanPython/
 ├── backend_fastapi/      # FastAPI async backend (RAG, FAISS, Gemini, GitHub)
@@ -92,14 +92,14 @@ SupermanPython/
 
 ---
 
-## 🛠️ How It Works
+## How It Works
 1. **Index a Repo**: Enter a GitHub repo (e.g., `facebook/react`) and click "Index Repo". The backend crawls, chunks, embeds, and stores all code/docs.
 2. **Ask Questions**: Type any question about the repo. The backend retrieves relevant context, augments your query, and gets a cited answer from Gemini LLM.
 3. **Get Cited Answers**: See answers with code snippets and file path citations for instant onboarding.
 
 ---
 
-## ⚡ Usage
+## Usage
 ### Backend
 1. Set environment variables in `.env` (see `backend_fastapi/docs/configuration.md`)
 2. Install dependencies:
@@ -125,32 +125,24 @@ SupermanPython/
 
 ---
 
-## 🧪 Testing
+## Testing
 - Backend: `pytest backend_fastapi/tests/`
 - Frontend: Use the UI and check API responses
 
 ---
 
-## 📚 Documentation
+## Documentation
 - Backend: `backend_fastapi/docs/README.md`, `rag_pipeline.md`, `configuration.md`
 - Frontend: `docs/frontend_detailed_documentation.md`
 - Architecture: `docs/architecture/architecture.md`
 
 ---
 
-## 💡 Why This Project Stands Out
-- **Real RAG**: Not a toy—full async pipeline, real vector search, real LLM, real citations
-- **Production Ready**: Docker, config, error handling, modular code, tests
-- **Modern Stack**: FastAPI + Next.js + Gemini + FAISS
-- **Beautiful UI**: Clean, modern, and user-friendly
-- **Extensible**: Easy to add new LLMs, vector DBs, or UI features
+
+## Author
+- Asmit Banik
 
 ---
 
-## 👤 Author
-- [Your Name] ([your.email@example.com](mailto:your.email@example.com))
-
----
-
-## 📝 License
+## License
 MIT License
