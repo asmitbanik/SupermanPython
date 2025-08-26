@@ -2,7 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-type Cite = { path: string; rank: number; score: number };
+type Cite = { path: string; rank: number; score: number; line_start?: number; line_end?: number };
 
 export default function Page() {
   const [repo, setRepo] = useState("facebook/react");
@@ -11,6 +11,8 @@ export default function Page() {
   const [answer, setAnswer] = useState("");
   const [cites, setCites] = useState<Cite[]>([]);
   const [msg, setMsg] = useState("");
+  // Optional: default branch used for deep links
+  const [branch, setBranch] = useState("main");
 
   // Use environment variable injected at build time for client components
   // Avoid process.env in browser: use public env or fallback
@@ -53,6 +55,13 @@ export default function Page() {
           placeholder="owner/repo e.g. facebook/react"
           style={{ flex: 1, padding: 10, border: "1px solid #ccc", borderRadius: 6 }}
         />
+        <input
+          value={branch}
+          onChange={e => setBranch(e.target.value)}
+          placeholder="branch (e.g. main)"
+          style={{ width: 140, padding: 10, border: "1px solid #ccc", borderRadius: 6 }}
+          title="Branch for GitHub deep links"
+        />
         <button onClick={doIndex} disabled={indexing} style={{ padding: "10px 16px" }}>
           {indexing ? "Indexing..." : "Index Repo"}
         </button>
@@ -83,11 +92,34 @@ export default function Page() {
         <>
           <h4 style={{ marginTop: 16 }}>Citations</h4>
           <ul>
-            {cites.map((c, i) => (
-              <li key={i}>
-                <code>{c.path}</code> • rank {c.rank} • score {c.score.toFixed(3)}
-              </li>
-            ))}
+            {cites.map((c, i) => {
+              const hasLines = typeof c.line_start === "number" && typeof c.line_end === "number";
+              const lineAnchor = hasLines
+                ? (c.line_start === c.line_end
+                    ? `#L${c.line_start}`
+                    : `#L${c.line_start}-L${c.line_end}`)
+                : "";
+              const href = `https://github.com/${repo}/blob/${branch}/${c.path}${lineAnchor}`;
+              const copyText = hasLines
+                ? `${repo}/${c.path}:${c.line_start}-${c.line_end}`
+                : `${repo}/${c.path}`;
+              return (
+                <li key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <a href={href} target="_blank" rel="noreferrer" title="Open on GitHub">
+                    <code>{c.path}</code>
+                  </a>
+                  <span>• rank {c.rank} • score {c.score.toFixed(3)}</span>
+                  {hasLines && <span>• lines {c.line_start}–{c.line_end}</span>}
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(copyText)}
+                    style={{ marginLeft: 6, padding: "2px 6px", border: "1px solid #ccc", borderRadius: 4, background: "#f8f8f8" }}
+                    title="Copy path to clipboard"
+                  >
+                    Copy
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </>
       )}

@@ -1,6 +1,9 @@
 import os
 import numpy as np
-import faiss
+try:
+    import faiss  # type: ignore
+except Exception:
+    faiss = None  # graceful degradation if FAISS is not installed
 import json
 from config import VECTOR_DIR
 from typing import List, Dict
@@ -21,6 +24,9 @@ class FaissService:
         idx_path, meta_path, vec_path = self._paths(repo)
         if vectors.size == 0:
             return 0, 0
+        if faiss is None:
+            # Cannot persist vectors without FAISS installed
+            return 0, 0
         Vn = vectors.astype('float32')
         dim = Vn.shape[1]
         index = faiss.IndexFlatIP(dim)
@@ -34,6 +40,8 @@ class FaissService:
 
     async def search(self, repo: str, query_vec: np.ndarray, top_k: int):
         idx_path, meta_path, vec_path = self._paths(repo)
+        if faiss is None:
+            return []
         if not (os.path.exists(idx_path) and os.path.exists(meta_path) and os.path.exists(vec_path)):
             return []
         index = faiss.read_index(idx_path)
@@ -46,5 +54,13 @@ class FaissService:
                 m = dict(meta[i])
                 m['rank'] = rank
                 m['score'] = float(D[0][rank])
+                m['_vec_index'] = int(i)
                 hits.append(m)
         return hits
+
+    def vectors_for_repo(self, repo: str) -> np.ndarray:
+        """Load vectors array for a repo (float32)."""
+        _, _, vec_path = self._paths(repo)
+        if not os.path.exists(vec_path):
+            return np.empty((0, 0), dtype='float32')
+        return np.load(vec_path).astype('float32')

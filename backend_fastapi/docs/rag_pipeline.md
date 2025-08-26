@@ -16,8 +16,10 @@
 - Metadata stored alongside vectors
 
 ## 4. Retrieval
-- Embed user query
+- Embed user query (async)
 - Top-k vector search in FAISS
+- Dedupe and limit per-path for diversity
+- Greedy context packing under token budget
 - Return context chunks for LLM
 
 ## 5. LLM Integration

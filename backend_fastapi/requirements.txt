@@ -6,3 +6,7 @@ httpx
 faiss-cpu
 python-dotenv
 pytest
+numpy
+tiktoken
+pytest-asyncio
+ruff

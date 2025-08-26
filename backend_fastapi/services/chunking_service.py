@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from config import CHUNK_TOKENS, CHUNK_OVERLAP
 
 try:
@@ -31,6 +31,18 @@ def _window(text: str, max_tokens: int, overlap: int) -> List[str]:
         out.append(_enc.decode(ids[start:start+max_tokens]))
     return out
 
+def _line_span(doc_text: str, chunk_text: str, start_search: int) -> Tuple[int, int, int]:
+    """Return (line_start, line_end, new_search_pos). If not found, guesses using counts."""
+    pos = doc_text.find(chunk_text, start_search)
+    if pos == -1:
+        pos = doc_text.find(chunk_text)  # fallback
+        if pos == -1:
+            # Best-effort: approximate to beginning
+            return 1, 1 + chunk_text.count('\n'), start_search
+    line_start = doc_text.count('\n', 0, pos) + 1
+    line_end = line_start + chunk_text.count('\n')
+    return line_start, line_end, pos + len(chunk_text)
+
 def smart_chunk(doc: Dict) -> List[Dict]:
     path, text = doc["path"], doc["text"]
     segments = [s for s in MD_SPLIT.split(text) if s and not s.isspace()]
@@ -38,13 +50,16 @@ def smart_chunk(doc: Dict) -> List[Dict]:
         segments = [text]
     chunks = []
     idx = 0
+    search_pos = 0
     for seg in segments:
         if _tok_count(seg) <= CHUNK_TOKENS:
-            chunks.append({"key": f"{path}:{idx}", "path": path, "idx": idx, "text": seg})
+            ls, le, search_pos = _line_span(text, seg, search_pos)
+            chunks.append({"key": f"{path}:{idx}", "path": path, "idx": idx, "text": seg, "line_start": ls, "line_end": le})
             idx += 1
         else:
             for w in _window(seg, CHUNK_TOKENS, CHUNK_OVERLAP):
-                chunks.append({"key": f"{path}:{idx}", "path": path, "idx": idx, "text": w})
+                ls, le, search_pos = _line_span(text, w, search_pos)
+                chunks.append({"key": f"{path}:{idx}", "path": path, "idx": idx, "text": w, "line_start": ls, "line_end": le})
                 idx += 1
     return chunks
 
